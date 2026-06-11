@@ -29,9 +29,12 @@ def compute_edge(state_table):
 
 
 def extract_tradeable(edge):
-    mask = ((edge["E_raw"] > 0) & (edge["visits"] >= MIN_VISITS) &
-            (edge["t_stat"] >= T_THRESHOLD) & (edge["regime"].isin(TRADEABLE_REG)))
-    return edge[mask].copy()
+    base = (edge["visits"] >= MIN_VISITS) & (edge["regime"].isin(TRADEABLE_REG))
+    long_mask  = base & (edge["t_stat"] >=  T_THRESHOLD)
+    short_mask = base & (edge["t_stat"] <= -T_THRESHOLD)
+    out_l = edge[long_mask].copy();  out_l["side"] = "L"
+    out_s = edge[short_mask].copy(); out_s["side"] = "S"
+    return pd.concat([out_l, out_s], ignore_index=True)
 
 
 def main():
@@ -48,7 +51,7 @@ def main():
     print(f"\n[summary]")
     print(f"  E>0: {(edge['E_raw']>0).sum()} | visits>={MIN_VISITS}: {(edge['visits']>=MIN_VISITS).sum()}")
     print(f"  t>={T_THRESHOLD}: {(edge['t_stat']>=T_THRESHOLD).sum()} | regime: {edge['regime'].isin(TRADEABLE_REG).sum()}")
-    print(f"  TRADEABLE: {len(tradeable)}")
+    print(f"  TRADEABLE: {len(tradeable)}  (L={(tradeable['side']=='L').sum()} S={(tradeable['side']=='S').sum()})")
     if len(tradeable) > 0:
         print(f"  regime: {tradeable['regime'].value_counts().to_dict()}")
         print(f"  E_raw: [{tradeable['E_raw'].min():.6f}, {tradeable['E_raw'].max():.6f}]")
