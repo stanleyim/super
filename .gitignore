@@ -4,9 +4,3 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.npz
-
-# processed data (재생성 가능)
-data/processed/*
-# 예외: failure topology snapshot 보존
-!data/processed/failure/
-!data/processed/failure/**

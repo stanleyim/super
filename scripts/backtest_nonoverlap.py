@@ -45,32 +45,26 @@ def identify_tradeable(df):
     stats["t_stat"] = stats["mu_r"] / (stats["sigma_r"] / np.sqrt(stats["visits"]))
     rm = train.dropna(subset=["regime"]).groupby("state_id")["regime"].agg(lambda s: s.mode().iloc[0] if len(s) else None).to_dict()
     stats["regime"] = stats["state_id"].map(rm)
-    base = (stats["visits"]>=MIN_VISITS) & (stats["regime"].isin(TRADEABLE_REG))
-    long_mask  = base & (stats["t_stat"] >=  T_THRESHOLD)
-    short_mask = base & (stats["t_stat"] <= -T_THRESHOLD)
-    out = {}
-    for sid in stats[long_mask]["state_id"].astype(int):  out[int(sid)] = "L"
-    for sid in stats[short_mask]["state_id"].astype(int): out[int(sid)] = "S"
-    return out
+    mask = ((stats["mu_r"]>0) & (stats["visits"]>=MIN_VISITS) &
+            (stats["t_stat"]>=T_THRESHOLD) & (stats["regime"].isin(TRADEABLE_REG)))
+    return set(stats[mask]["state_id"].astype(int))
 
 
 def gen_trades(df, tradeable):
     test = df[(df["date"]>=TEST_START) & df[f"ret_{H}"].notna()].copy()
-    cand = test[test["state_id"].isin(tradeable.keys())].sort_values(["code","date"])
+    cand = test[test["state_id"].isin(tradeable)].sort_values(["code","date"])
     trades = []
     for code, grp in cand.groupby("code", sort=False):
-        last_exit = pd.Timestamp.min      # per-code blocking (L+S unified)
+        last_exit = pd.Timestamp.min
         for _, row in grp.iterrows():
             if row["date"] <= last_exit: continue
-            sid = int(row["state_id"])
             trades.append({"entry_date":row["date"], "exit_date":row["exit_date"],
-                           "code":code, "state_id":sid, "regime":row["regime"],
-                           "side":tradeable[sid], "ret_gross":row[f"ret_{H}"]})
+                           "code":code, "state_id":row["state_id"], "regime":row["regime"],
+                           "ret_gross":row[f"ret_{H}"]})
             last_exit = row["exit_date"]
     if not trades: return None
     tr = pd.DataFrame(trades)
-    sign = np.where(tr["side"].values=="S", -1.0, 1.0)
-    tr["ret_net"] = sign * tr["ret_gross"] - COST_RT
+    tr["ret_net"] = tr["ret_gross"] - COST_RT
     return tr
 
 
@@ -87,11 +81,10 @@ def portfolio_path(trades, df):
     for _, tr in trades.iterrows():
         i_s = didx.get(tr["entry_date"]); i_e = didx.get(tr["exit_date"])
         if i_s is None or i_e is None: continue
-        s = -1.0 if tr.get("side","L")=="S" else 1.0
         for i in range(i_s+1, i_e+1):
             r = rmap.get((tr["code"], all_dates[i]), 0.0)
             if pd.isna(r): r = 0.0
-            daily_pnl[i] += s*r; n_active[i] += 1
+            daily_pnl[i] += r; n_active[i] += 1
         if i_e < n and n_active[i_e] > 0: daily_pnl[i_e] -= COST_RT
     with np.errstate(divide="ignore", invalid="ignore"):
         pr = np.where(n_active>0, daily_pnl/n_active, 0.0)
