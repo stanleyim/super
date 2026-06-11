@@ -94,16 +94,16 @@ def build_regime_labels(panel_close: pd.DataFrame) -> pd.DataFrame:
 # ============================================================
 def compute_regime_pnl(trades: pd.DataFrame, regime_labels: pd.DataFrame) -> pd.DataFrame:
     t = trades.merge(
-        regime_labels[["date", "regime"]].rename(columns={"date": COL_ENTRY}),
+        regime_labels[["date", "regime"]].rename(columns={"date": COL_ENTRY, "regime": "macro_regime"}),
         on=COL_ENTRY, how="left"
     )
-    g = t.groupby("regime")[COL_PNL]
+    g = t.groupby("macro_regime")[COL_PNL]
     out = pd.DataFrame({
         "n_trades": g.size(),
         "mean":     g.mean(),
         "std":      g.std(ddof=1),
         "sum":      g.sum(),
-        "hit_rate": (t.groupby("regime")[COL_PNL].apply(lambda s: (s > 0).mean())),
+        "hit_rate": (t.groupby("macro_regime")[COL_PNL].apply(lambda s: (s > 0).mean())),
     })
     out["sharpe_ann"] = out["mean"] / (out["std"] + EPS) * ANN_FACTOR
     return out.reset_index()
@@ -114,10 +114,10 @@ def compute_regime_pnl(trades: pd.DataFrame, regime_labels: pd.DataFrame) -> pd.
 # ============================================================
 def compute_state_decomp(trades: pd.DataFrame, regime_labels: pd.DataFrame) -> pd.DataFrame:
     t = trades.merge(
-        regime_labels[["date", "regime"]].rename(columns={"date": COL_ENTRY}),
+        regime_labels[["date", "regime"]].rename(columns={"date": COL_ENTRY, "regime": "macro_regime"}),
         on=COL_ENTRY, how="left"
     )
-    g = t.groupby([COL_STATE, "regime"])[COL_PNL]
+    g = t.groupby([COL_STATE, "macro_regime"])[COL_PNL]
     out = pd.DataFrame({
         "n":    g.size(),
         "mean": g.mean(),
@@ -168,8 +168,8 @@ def kl_bull_vs_bear(drift: pd.DataFrame) -> pd.DataFrame:
 # E. EV FLIP MAP — Welch's t per state
 # ============================================================
 def compute_ev_flip_map(state_decomp: pd.DataFrame) -> pd.DataFrame:
-    bull = state_decomp[state_decomp["regime"]=="BULL"].set_index(COL_STATE)
-    bear = state_decomp[state_decomp["regime"]=="BEAR"].set_index(COL_STATE)
+    bull = state_decomp[state_decomp["macro_regime"]=="BULL"].set_index(COL_STATE)
+    bear = state_decomp[state_decomp["macro_regime"]=="BEAR"].set_index(COL_STATE)
     common = bull.index.intersection(bear.index)
     if len(common) == 0:
         return pd.DataFrame(columns=[COL_STATE,"mu_bull","mu_bear","t_flip","reliable"])
