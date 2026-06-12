@@ -12,3 +12,14 @@ data/processed/*
 !data/processed/failure/**
 !data/processed/state_vector/
 !data/processed/state_vector/panel.parquet
+
+# STAGE 2 observation outputs (whitelist for reproducibility)
+!data/processed/observation/
+!data/processed/observation/*.parquet
+!data/processed/observation/*.json
+!reports/
+!reports/*.png
+# trades artifact only (policy: minimal whitelist)
+!data/processed/backtest/
+!data/processed/backtest/h20_nonoverlap/
+!data/processed/backtest/h20_nonoverlap/trades.parquet

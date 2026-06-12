@@ -1,0 +1,13 @@
+{
+  "n_trades": 5593,
+  "win_rate_net": 0.5194,
+  "avg_active": 133.48,
+  "sharpe_net_ann": 1.806,
+  "sortino_net_ann": 2.125,
+  "mdd": -0.2296,
+  "cagr": 0.5677,
+  "calmar": 2.473,
+  "final_equity": 4.6935,
+  "horizon_days": 20,
+  "cost_rt": 0.003
+}

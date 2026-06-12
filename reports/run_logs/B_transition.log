@@ -1,0 +1,11 @@
+[load]
+  577,311 rows | 261 codes
+[stats] populated: 1296/1296
+  σ Q30=0.9137 med=0.9874 Q70=1.0928 | |μ| med=0.0416 Q70=0.0690 | H med=4.2907
+  SHOCK     :  150 states
+  TREND     :  197 states
+  RANGE     :  232 states
+  TRANSITION:  717 states
+  saved (dry_run=False)
+
+✅
