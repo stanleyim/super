@@ -4,3 +4,11 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.npz
+
+# processed data (재생성 가능)
+data/processed/*
+# 예외: analytics snapshot (observation layer)
+!data/processed/failure/
+!data/processed/failure/**
+!data/processed/state_vector/
+!data/processed/state_vector/panel.parquet
