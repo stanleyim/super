@@ -21,7 +21,7 @@ from sklearn.cluster import KMeans
 from hmmlearn.hmm import CategoricalHMM
 
 # ============ PATHS ============
-ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT     = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SV_DIR   = os.path.join(ROOT, "data", "processed", "state_vector")
 OUT_DIR  = os.path.join(ROOT, "data", "processed", "regime")
 LOG_DIR  = os.path.join(ROOT, "reports", "run_logs")

@@ -1,0 +1,57 @@
+{
+  "n_valid_pairs": 512076,
+  "N_state": [
+    122957,
+    51054,
+    47987,
+    7525,
+    8638,
+    173024,
+    50576,
+    50315
+  ],
+  "E_state": [
+    0.0005264774282853278,
+    0.001064199440201975,
+    -0.0013929509684461538,
+    0.001053521651676417,
+    0.008801232397472464,
+    0.0012299109719781554,
+    -0.0004146893557225818,
+    -0.0001866256534911963
+  ],
+  "diag_E_transition": [
+    -0.0001048990467815628,
+    -0.006601930520889016,
+    null,
+    0.00033909863851400157,
+    0.03900364619210406,
+    0.0015583645788848656,
+    null,
+    null
+  ],
+  "observed_states": 8,
+  "observed_trans": 34,
+  "trans_total_cells": 64,
+  "sparsity_trans": 0.46875,
+  "label_map": {
+    "0": "TRANSITION",
+    "1": "TRANSITION",
+    "2": "TRANSITION",
+    "3": "TREND",
+    "4": "TRANSITION",
+    "5": "SHOCK",
+    "6": "TREND",
+    "7": "TREND"
+  },
+  "definitions": {
+    "r_t": "p_{t+1} - p_t  where p = log(close)",
+    "E_state": "E[r_t | Z_t = i]",
+    "E_transition": "E[r_t | Z_t = i, Z_{t+1} = j]",
+    "inclusion": "\u03b2 SYMMETRIC: Z_t != -1 AND Z_{t+1} != -1",
+    "missing_cell": "NaN (no fill, N14)"
+  },
+  "params": {
+    "K_REGIME": 8
+  }
+}

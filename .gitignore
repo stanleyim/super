@@ -23,3 +23,11 @@ data/processed/*
 !data/processed/backtest/
 !data/processed/backtest/h20_nonoverlap/
 !data/processed/backtest/h20_nonoverlap/trades.parquet
+
+# MSM v1 outputs (whitelist for reproducibility)
+!data/processed/regime/
+!data/processed/regime/**
+!data/processed/transition/
+!data/processed/transition/**
+!data/processed/edge/
+!data/processed/edge/**
